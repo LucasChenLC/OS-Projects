@@ -4,7 +4,7 @@
 #include <pthread.h>
 
 int com_data[5];
-int num = 0;
+int start = 0, end = 0;
 pthread_mutex_t mutex;
 
 void *reader(void *mode){
@@ -12,15 +12,14 @@ void *reader(void *mode){
     int *mod = (int *)mode;
     for(int i=0; i<10;){
         pthread_mutex_lock(&mutex);
-        if (num > 0) {
-            buffer[i%2] = com_data[--num];
-            i++;
-            if (!(i%2)){
-                if (*mod)
-                    printf("%d + %d = %d\n", buffer[0], buffer[1], buffer[0] + buffer[1]);
-                else
-                    printf("%d * %d = %d\n", buffer[0], buffer[1], buffer[0] * buffer[1]);
-            }
+        if (end - start >= 2) {
+            buffer[0] = com_data[(start++)%5];
+            buffer[1] = com_data[(start++)%5];
+            i+=2;
+            if (*mod)
+                printf("%d + %d = %d\n", buffer[0], buffer[1], buffer[0] + buffer[1]);
+            else
+                printf("%d * %d = %d\n", buffer[0], buffer[1], buffer[0] * buffer[1]);
         }
         pthread_mutex_unlock(&mutex);
     }
@@ -32,8 +31,10 @@ void *producer(void *file_path){
     FILE *fp = fopen(f, "r");
     for(int i=0; i<10;){
         pthread_mutex_lock(&mutex);
-        if(num < 2) {
-            fscanf(fp, "%d", &com_data[num++]);
+        if(end - start < 5) {
+            //printf("%d %d\n", start, end);
+            fscanf(fp, "%d", &com_data[(end++)%5]);
+            printf("deliever data %d to pool[%d]\n", com_data[(end-1)%5], (end-1)%5);
             i++;
         }
         pthread_mutex_unlock(&mutex);
