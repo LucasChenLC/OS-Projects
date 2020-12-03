@@ -1,6 +1,5 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <unistd.h>
 #include <pthread.h>
 
 int com_data[5];
@@ -45,8 +44,8 @@ void *producer(void *file_path){
 
 int main(void){
     pthread_t r1,r2,p1,p2;
-    char *file_path1 = "data1.txt";
-    char *file_path2 = "data2.txt";
+    char *file_path1 = "testcase/data1.txt";
+    char *file_path2 = "testcase/data2.txt";
     int mode0 = 0, *mod0, mode1 = 1, *mod1;
     mod0 = &mode0;
     mod1 = &mode1;
